@@ -47,6 +47,34 @@ python -m ledger_agent.api
    ```
 4. 运行 `fly deploy`，部署完成后通过 `fly open` 访问。
 
+## 测试页面部署（可选）
+
+测试页面 `test-page.html` 可以通过以下方式部署：
+
+### 方案 1：GitHub Pages（推荐，最简单）
+
+1. 在 GitHub 仓库设置中，进入 "Pages"
+2. 选择 Source 为 `main` 分支，文件夹选择 `/ (root)`
+3. 保存后，GitHub 会提供一个 URL，例如：`https://wangwenjiaagnes.github.io/data-analysis-agent/test-page.html`
+4. 访问该 URL 即可使用测试页面
+
+### 方案 2：Render Static Site
+
+1. 在 Render Dashboard 创建 "Static Site"
+2. 连接同一个 GitHub 仓库
+3. Build Command 留空或设为 `echo "No build needed"`
+4. Publish Directory 设为 `/`（根目录）
+5. 部署后访问 `https://<your-site>.onrender.com/test-page.html`
+
+### 方案 3：Netlify
+
+1. 在 Netlify 连接 GitHub 仓库
+2. Build command 留空
+3. Publish directory 设为 `/`
+4. 部署后访问 `https://<your-site>.netlify.app/test-page.html`
+
+**注意**：测试页面调用的是 Render 上的 API（`https://data-analysis-agent-vn7n.onrender.com/ask`），确保 API 服务正常运行。
+
 ## 日志与监控
 
 - Railway/Render 均可在控制台查看实时日志，便于排查错误。
