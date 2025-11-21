@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>账本数据分析 AI Agent</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/@fluentui/react-components@latest/dist/webpack/css/fluent.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Segoe UI Web (West European)', 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #0078d4 0%, #106ebe 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: #ffffff;
+            border-radius: 4px;
+            box-shadow: 0 1.6px 3.6px rgba(0, 0, 0, 0.13), 0 0.3px 0.9px rgba(0, 0, 0, 0.11);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #323130;
+            margin-bottom: 8px;
+            font-size: 28px;
+            font-weight: 600;
+            line-height: 36px;
+        }
+
+        .subtitle {
+            color: #605e5c;
+            margin-bottom: 32px;
+            font-size: 14px;
+            line-height: 20px;
+        }
+
+        .input-container {
+            margin-bottom: 20px;
+        }
+
+        .button-container {
+            margin-bottom: 20px;
+        }
+
+        .response-container {
+            margin-top: 24px;
+            padding: 16px;
+            background: #faf9f8;
+            border: 1px solid #edebe9;
+            border-radius: 2px;
+            min-height: 60px;
+            display: none;
+        }
+
+        .response-container.show {
+            display: block;
+        }
+
+        .response-text {
+            color: #323130;
+            line-height: 20px;
+            white-space: pre-wrap;
+            font-size: 14px;
+        }
+
+        .loading-container {
+            text-align: center;
+            margin-top: 24px;
+            display: none;
+        }
+
+        .loading-container.show {
+            display: block;
+        }
+
+        .error-container {
+            margin-top: 16px;
+            padding: 12px;
+            background: #fef6f6;
+            border: 1px solid #d13438;
+            border-radius: 2px;
+            color: #d13438;
+            display: none;
+            font-size: 14px;
+        }
+
+        .error-container.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f2f1;
+            border-top: 3px solid #0078d4;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        function App() {
+            const [query, setQuery] = useState('');
+            const [response, setResponse] = useState('');
+            const [loading, setLoading] = useState(false);
+            const [error, setError] = useState('');
+            const API_URL = 'https://data-analysis-agent-vn7n.onrender.com/ask';
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                if (!query.trim()) return;
+
+                setError('');
+                setResponse('');
+                setLoading(true);
+
+                try {
+                    const res = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ query: query.trim() })
+                    });
+
+                    if (!res.ok) {
+                        throw new Error(`HTTP error! status: ${res.status}`);
+                    }
+
+                    const data = await res.json();
+                    
+                    if (data.status === 'success') {
+                        setResponse(data.response);
+                    } else {
+                        throw new Error(data.error || '未知错误');
+                    }
+                } catch (err) {
+                    setError(`错误: ${err.message}`);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            return (
+                <div className="container">
+                    <h1>账本数据分析 AI Agent</h1>
+                    <p className="subtitle">输入您的问题，AI 将为您分析账本数据</p>
+
+                    <form onSubmit={handleSubmit}>
+                        <div className="input-container">
+                            <input
+                                type="text"
+                                value={query}
+                                onChange={(e) => setQuery(e.target.value)}
+                                placeholder="例如：本月总支出是多少？"
+                                style={{
+                                    width: '100%',
+                                    padding: '8px 12px',
+                                    fontSize: '14px',
+                                    border: '1px solid #8a8886',
+                                    borderRadius: '2px',
+                                    outline: 'none',
+                                    fontFamily: 'inherit'
+                                }}
+                                onFocus={(e) => e.target.style.borderColor = '#0078d4'}
+                                onBlur={(e) => e.target.style.borderColor = '#8a8886'}
+                            />
+                        </div>
+
+                        <div className="button-container">
+                            <button
+                                type="submit"
+                                disabled={loading || !query.trim()}
+                                style={{
+                                    width: '100%',
+                                    padding: '8px 16px',
+                                    fontSize: '14px',
+                                    fontWeight: 600,
+                                    backgroundColor: loading || !query.trim() ? '#c8c6c4' : '#0078d4',
+                                    color: '#ffffff',
+                                    border: 'none',
+                                    borderRadius: '2px',
+                                    cursor: loading || !query.trim() ? 'not-allowed' : 'pointer',
+                                    fontFamily: 'inherit',
+                                    transition: 'background-color 0.2s'
+                                }}
+                                onMouseEnter={(e) => {
+                                    if (!loading && query.trim()) {
+                                        e.target.style.backgroundColor = '#106ebe';
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    if (!loading && query.trim()) {
+                                        e.target.style.backgroundColor = '#0078d4';
+                                    }
+                                }}
+                            >
+                                查询
+                            </button>
+                        </div>
+                    </form>
+
+                    {loading && (
+                        <div className="loading-container show">
+                            <div className="spinner"></div>
+                            <p style={{ color: '#605e5c', fontSize: '14px' }}>正在分析中...</p>
+                        </div>
+                    )}
+
+                    {error && (
+                        <div className="error-container show">
+                            {error}
+                        </div>
+                    )}
+
+                    {response && (
+                        <div className="response-container show">
+                            <div className="response-text">{response}</div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
+
