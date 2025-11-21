@@ -146,11 +146,13 @@
                         headers: {
                             'Content-Type': 'application/json',
                         },
+                        mode: 'cors',
                         body: JSON.stringify({ query: query.trim() })
                     });
 
                     if (!res.ok) {
-                        throw new Error(`HTTP error! status: ${res.status}`);
+                        const errorText = await res.text();
+                        throw new Error(`HTTP ${res.status}: ${errorText}`);
                     }
 
                     const data = await res.json();
@@ -161,7 +163,8 @@
                         throw new Error(data.error || '未知错误');
                     }
                 } catch (err) {
-                    setError(`错误: ${err.message}`);
+                    console.error('API Error:', err);
+                    setError(`错误: ${err.message}. 请检查 Render 服务是否已重新部署（需要包含 CORS 支持）`);
                 } finally {
                     setLoading(false);
                 }
