@@ -49,6 +49,24 @@ def health():
     })
 
 
+@app.route('/debug/current-month', methods=['GET'])
+def debug_current_month():
+    """调试端点：查看本月查询情况"""
+    try:
+        from .analyzer import Analyzer
+        analyzer = Analyzer()
+        result = analyzer.analyze({"date_range": "current_month"})
+        return jsonify({
+            'status': 'success',
+            'result': result
+        })
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'error': str(e)
+        }), 500
+
+
 if __name__ == '__main__':
     app.run(host=API_HOST, port=API_PORT, debug=True)
 
