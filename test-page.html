@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>账本数据分析 AI Agent</title>
+    <title>Ledger Data Analysis AI Agent</title>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -164,7 +164,7 @@
                     }
                 } catch (err) {
                     console.error('API Error:', err);
-                    setError(`错误: ${err.message}. 请检查 Render 服务是否已重新部署（需要包含 CORS 支持）`);
+                    setError(`Error: ${err.message}. Please check if Render service has been redeployed (CORS support required)`);
                 } finally {
                     setLoading(false);
                 }
@@ -172,8 +172,8 @@
 
             return (
                 <div className="container">
-                    <h1>账本数据分析 AI Agent</h1>
-                    <p className="subtitle">输入您的问题，AI 将为您分析账本数据</p>
+                    <h1>Ledger Data Analysis AI Agent</h1>
+                    <p className="subtitle">Enter your question, and AI will analyze your ledger data</p>
 
                     <form onSubmit={handleSubmit}>
                         <div className="input-container">
@@ -181,7 +181,7 @@
                                 type="text"
                                 value={query}
                                 onChange={(e) => setQuery(e.target.value)}
-                                placeholder="例如：本月总支出是多少？"
+                                placeholder="e.g., What is the total expenditure this month?"
                                 style={{
                                     width: '100%',
                                     padding: '8px 12px',
@@ -224,7 +224,7 @@
                                     }
                                 }}
                             >
-                                查询
+                                Query
                             </button>
                         </div>
                     </form>
@@ -232,7 +232,7 @@
                     {loading && (
                         <div className="loading-container show">
                             <div className="spinner"></div>
-                            <p style={{ color: '#605e5c', fontSize: '14px' }}>正在分析中...</p>
+                            <p style={{ color: '#605e5c', fontSize: '14px' }}>Analyzing...</p>
                         </div>
                     )}
 
