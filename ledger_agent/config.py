@@ -16,9 +16,38 @@ GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
+def _get_int_env(key: str, default: int) -> int:
+    """
+    安全地解析整型环境变量
+
+    支持两种场景：
+    1. 直接设置数字字符串，例如 "5000"
+    2. 引用另一个变量，例如 "$PORT"
+    """
+    value = os.getenv(key)
+    if not value:
+        return default
+
+    # 如果是引用其他变量（例如 "$PORT"）
+    if value.startswith("$"):
+        ref_key = value[1:]
+        ref_value = os.getenv(ref_key)
+        if ref_value:
+            try:
+                return int(ref_value)
+            except ValueError:
+                pass
+        return default
+
+    try:
+        return int(value)
+    except ValueError:
+        return default
+
+
 # API 服务配置
 API_HOST = os.getenv("API_HOST", "0.0.0.0")
-API_PORT = int(os.getenv("API_PORT", "5000"))
+API_PORT = _get_int_env("API_PORT", 5000)
 
 
 def validate_config():
