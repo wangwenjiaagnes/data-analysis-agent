@@ -28,13 +28,14 @@ class Database:
         Returns:
             交易列表
         """
-        start_iso = f"{start_date}T00:00:00+00:00"
-        end_iso = f"{end_date}T23:59:59.999999+00:00"
+        # 使用 transaction_date_local 字段（本地时间，不包含时区）
+        start_iso = f"{start_date}T00:00:00"
+        end_iso = f"{end_date}T23:59:59"
 
         try:
             query = self.client.table("transactions").select("*").gte(
-                "transaction_date", start_iso
-            ).lte("transaction_date", end_iso)
+                "transaction_date_local", start_iso
+            ).lte("transaction_date_local", end_iso)
 
             if transaction_type:
                 query = query.eq("type", transaction_type.lower())

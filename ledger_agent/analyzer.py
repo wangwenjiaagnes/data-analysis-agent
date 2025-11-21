@@ -66,13 +66,14 @@ class Analyzer:
         total_expense = 0.0
         
         for transaction in transactions:
-            amount = float(transaction.get("amount", 0))
+            # 使用 cny_amount 字段（人民币金额），而不是 amount（原始金额，可能是多种货币）
+            cny_amount = float(transaction.get("cny_amount", 0) or 0)
             transaction_type = transaction.get("type", "").lower()
             
             if transaction_type == "income":
-                total_income += amount
+                total_income += cny_amount
             elif transaction_type == "expense":
-                total_expense += amount
+                total_expense += cny_amount
         
         net_balance = total_income - total_expense
         
@@ -105,6 +106,14 @@ class Analyzer:
         # 获取日期范围
         date_range_type = params.get("date_range", "current_month")
         transaction_type = params.get("type")
+        
+        # 标准化交易类型：将 "expenditure" 映射为 "expense"
+        if transaction_type:
+            transaction_type = transaction_type.lower()
+            if transaction_type in ["expenditure", "expense", "支出"]:
+                transaction_type = "expense"
+            elif transaction_type in ["income", "收入"]:
+                transaction_type = "income"
 
         start_date, end_date = self.get_date_range(date_range_type)
         
