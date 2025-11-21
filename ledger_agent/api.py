@@ -3,10 +3,12 @@ HTTP API 服务
 用于部署上线
 """
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from .core import AgentCore
 from .config import API_HOST, API_PORT
 
 app = Flask(__name__)
+CORS(app)  # 允许跨域请求
 agent = AgentCore()
 
 
