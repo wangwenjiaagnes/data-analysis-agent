@@ -15,7 +15,7 @@ class Analyzer:
     
     def get_date_range(self, date_range_type: str) -> tuple:
         """
-        获取日期范围
+        获取日期范围（使用 UTC 时区，确保服务器和本地一致）
         
         Args:
             date_range_type: "current_month" | "previous_month" | "last_7_days" | "last_30_days"
@@ -23,23 +23,25 @@ class Analyzer:
         Returns:
             (start_date, end_date) 格式为 YYYY-MM-DD
         """
-        today = datetime.now()
+        from datetime import timezone
+        # 使用 UTC 时区，确保服务器和本地一致
+        today = datetime.now(timezone.utc)
         
         if date_range_type == "current_month":
-            start_date = today.replace(day=1)
+            start_date = today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
             end_date = today
         elif date_range_type == "previous_month":
             # 上个月的第一天
-            first_day_this_month = today.replace(day=1)
+            first_day_this_month = today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
             last_day_previous_month = first_day_this_month - timedelta(days=1)
-            start_date = last_day_previous_month.replace(day=1)
-            end_date = last_day_previous_month
+            start_date = last_day_previous_month.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            end_date = last_day_previous_month.replace(hour=23, minute=59, second=59, microsecond=999999)
         elif date_range_type == "last_7_days":
             end_date = today
-            start_date = today - timedelta(days=7)
+            start_date = (today - timedelta(days=7)).replace(hour=0, minute=0, second=0, microsecond=0)
         elif date_range_type == "last_30_days":
             end_date = today
-            start_date = today - timedelta(days=30)
+            start_date = (today - timedelta(days=30)).replace(hour=0, minute=0, second=0, microsecond=0)
         else:
             raise ValueError(f"Unknown date_range_type: {date_range_type}")
         
